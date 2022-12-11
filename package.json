@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next dev",
     "type-check": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "fmt": "prettier --write ."
   },
   "dependencies": {
     "next": "^13.0.5",
