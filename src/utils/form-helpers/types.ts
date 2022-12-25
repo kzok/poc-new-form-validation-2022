@@ -7,7 +7,7 @@ export type FormTouches = { readonly [_: string]: true | undefined };
 export type FormErrors = { readonly [_: string]: string | undefined };
 
 /** form state for state management */
-export type FormState<Form extends AnyObject> = Readonly<{
+export type FormState<in out Form extends AnyObject> = Readonly<{
   /** initial input values */
   initials: Readonly<Form>;
   /** current input values */

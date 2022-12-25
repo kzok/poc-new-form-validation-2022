@@ -2,7 +2,7 @@ import type { Validator, ValidationResult } from "./types";
 import { pass, fail } from "./utils";
 
 /** factory function returning validator */
-type ValidatorFactory<Options extends Readonly<Record<string, unknown>>> = (
+type ValidatorFactory<in out Options extends Record<string, unknown>> = (
   options: Readonly<Options>
 ) => Validator;
 
@@ -17,7 +17,7 @@ type BasicOptions = Readonly<{
  * @returns
  */
 export const createStringRule =
-  <Options extends Readonly<Record<string, unknown>> = Record<never, unknown>>(
+  <Options extends Record<string, unknown> = Record<never, unknown>>(
     rule: (value: string, options: Options) => ValidationResult
   ): ValidatorFactory<Options & BasicOptions> =>
   (options) =>

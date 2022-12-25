@@ -11,4 +11,6 @@ export type ValidationFailed = Readonly<{
 export type ValidationResult = ValidationPassed | ValidationFailed;
 
 /** function returning validation result */
-export type Validator<Value = string> = (value: Value) => ValidationResult;
+export type Validator<in out Value = string> = (
+  value: Value
+) => ValidationResult;

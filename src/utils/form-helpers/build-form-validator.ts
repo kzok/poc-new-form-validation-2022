@@ -5,25 +5,26 @@ type AcceptableRule<Value> =
   | validation.ValidationResult
   | validation.Validator<Value>;
 
-export type FormValidationCongfigulator<Form extends AnyObject> = (config: {
-  /** current form values */
-  values: Readonly<Form>;
-  /**
-   * Add validation rule
-   * @param key form key
-   * @param rules validation rules or results
-   */
-  add: <Key extends keyof Form>(
-    key: Key,
-    rules: AcceptableRule<Form[Key]>[]
-  ) => void;
-}) => void;
+export type FormValidationCongfigulator<in out Form extends AnyObject> =
+  (config: {
+    /** current form values */
+    values: Readonly<Form>;
+    /**
+     * Add validation rule
+     * @param key form key
+     * @param rules validation rules or results
+     */
+    add: <Key extends keyof Form>(
+      key: Key,
+      rules: AcceptableRule<Form[Key]>[]
+    ) => void;
+  }) => void;
 
 /**
  * @param formState current form state
  * @returns
  */
-export type FormValidator<Form extends AnyObject> = (
+export type FormValidator<in out Form extends AnyObject> = (
   formState: Pick<FormState<Form>, "values" | "touches">
 ) => FormErrors;
 
