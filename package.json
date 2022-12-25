@@ -7,11 +7,16 @@
     "fmt": "prettier --write ."
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/material": "^5.11.0",
+    "immer": "^9.0.16",
     "next": "^13.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@emotion/babel-plugin": "^11.10.5",
     "@jest/globals": "^29.3.1",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",
