@@ -1,8 +1,8 @@
-import * as validation from "../../validation";
-import { initializeFormState, touchAll } from "../utils";
+import { stringRules } from "../../validation";
+import { initializeState, touchAll } from "../utils";
 import { buildFormValidator } from "../build-form-validator";
 import { describe, it, expect } from "@jest/globals";
-import type { FormState } from "../types";
+import type { State } from "../types";
 import immer from "immer";
 
 describe("example scenario #1", () => {
@@ -12,7 +12,7 @@ describe("example scenario #1", () => {
     max: string;
   }>;
 
-  const exampleFormState = initializeFormState<ExampleForm>({
+  const exampleFormState = initializeState<ExampleForm>({
     enable: false,
     min: "",
     max: "",
@@ -21,20 +21,17 @@ describe("example scenario #1", () => {
   const validateForm = buildFormValidator<ExampleForm>((config) => {
     // validation rules activated only if enable is true
     if (config.values.enable) {
-      config.add("min", [
-        validation.rules.required({}),
-        validation.rules.integer({}),
-      ]);
+      config.add("min", [stringRules.required({}), stringRules.integer({})]);
       config.add("max", [
-        validation.rules.required({}),
-        validation.rules.integer({}),
-        validation.rules.integerGt({ rValue: config.values.min }),
+        stringRules.required({}),
+        stringRules.integer({}),
+        stringRules.integerGt({ target: config.values.min }),
       ]);
     }
   });
 
   it("form validator works as intended", () => {
-    let formState: FormState<ExampleForm> = exampleFormState;
+    let formState: State<ExampleForm> = exampleFormState;
 
     formState = immer(exampleFormState, (draft) => {
       draft.touches = touchAll(formState);

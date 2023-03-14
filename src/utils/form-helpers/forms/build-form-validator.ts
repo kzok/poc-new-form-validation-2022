@@ -1,31 +1,23 @@
-import type * as validation from "../validation";
-import type { AnyObject, FormErrors, FormState } from "./types";
+import type { ValidationResult, Validator } from "../validation";
+import type { AnyObject, FormValidator } from "./types";
 
-type AcceptableRule<Value> =
-  | validation.ValidationResult
-  | validation.Validator<Value>;
+type AcceptableRule<Value> = ValidationResult | Validator<Value>;
 
-export type FormValidationCongfigulator<Form extends AnyObject> = (config: {
-  /** current form values */
-  values: Readonly<Form>;
-  /**
-   * Add validation rule
-   * @param key form key
-   * @param rules validation rules or results
-   */
-  add: <Key extends keyof Form>(
-    key: Key,
-    rules: AcceptableRule<Form[Key]>[]
-  ) => void;
-}) => void;
-
-/**
- * @param formState current form state
- * @returns
- */
-export type FormValidator<Form extends AnyObject> = (
-  formState: Pick<FormState<Form>, "values" | "touches">
-) => FormErrors;
+export type FormValidatorConfig<Form extends AnyObject> = (
+  config: Readonly<{
+    /** current form values */
+    values: Readonly<Form>;
+    /**
+     * Add validation rule
+     * @param key form key
+     * @param rules validation rules or results
+     */
+    add: <Key extends keyof Form>(
+      key: Key,
+      rules: AcceptableRule<Form[Key]>[]
+    ) => void;
+  }>
+) => void;
 
 /**
  * @param value form value
@@ -50,7 +42,7 @@ const validateValue = <Value>(
  * @returns form validator
  */
 export const buildFormValidator = <Form extends AnyObject>(
-  configure: FormValidationCongfigulator<Form>
+  configure: FormValidatorConfig<Form>
 ): FormValidator<Form> => {
   return ({ values, touches }) => {
     // create map of validation rules by form key

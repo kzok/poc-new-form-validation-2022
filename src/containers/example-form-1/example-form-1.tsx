@@ -8,37 +8,39 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import * as validation from "../../utils/validation";
-import * as formHelpers from "../../utils/form-helpers";
+import { forms, validation } from "../../utils/form-helpers";
 import immer from "immer";
 
 type FormValue = Readonly<{
   haveInvitationCode: boolean;
   invidationCode: string;
-  customerId: string;
+  userId: string;
+  checksum: string;
 }>;
 
-type FormState = formHelpers.FormState<FormValue>;
+type FormState = forms.State<FormValue>;
 
-const initialState: FormState = formHelpers.initializeFormState({
+const initialState: FormState = forms.initializeState({
   haveInvitationCode: false,
   invidationCode: "",
-  customerId: "",
+  userId: "",
+  checksum: "",
 });
 
-const formValidator = formHelpers.buildFormValidator<FormValue>((config) => {
+const formValidator = forms.buildFormValidator<FormValue>((config) => {
   if (config.values.haveInvitationCode) {
     config.add("invidationCode", [
-      validation.rules.required({}),
-      validation.rules.number({}),
-      validation.rules.length({ size: 16 }),
+      validation.stringRules.required({}),
+      validation.stringRules.number({}),
+      validation.stringRules.length({ size: 16 }),
     ]);
   } else {
-    config.add("customerId", [
-      validation.rules.required({}),
-      validation.rules.number({}),
-      validation.rules.length({ size: 8 }),
+    config.add("userId", [
+      validation.stringRules.required({}),
+      validation.stringRules.number({}),
+      validation.stringRules.length({ size: 8 }),
     ]);
+    config.add("checksum", [validation.stringRules.required({})]);
   }
 });
 
@@ -69,10 +71,12 @@ const useFormState = () => {
     submit: () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
-          draft.touches = formHelpers.touchAll(draft);
+          draft.touches = forms.touchAll(draft);
           draft.errors = formValidator(draft);
-          if (formHelpers.isAllValid(draft)) {
-            window.alert(`submitted! ${JSON.stringify(draft.values)}`);
+          if (forms.isAllValid(draft)) {
+            window.alert(
+              `validation passed!\n ${JSON.stringify(draft.values)}`
+            );
           }
         })
       );
@@ -118,16 +122,27 @@ export const ExampleForm1: React.FC = () => {
           </>
         ) : (
           <>
-            <Typography variant="body1">Customer ID</Typography>
+            <Typography variant="body1">User ID</Typography>
             <TextField
               fullWidth
               variant="standard"
               label="8 digits"
-              value={formState.values.customerId}
-              onChange={(e) => onChange("customerId", e.target.value)}
-              onBlur={() => onBlur("customerId")}
-              helperText={formState.errors["customerId"]}
-              error={formState.errors["customerId"] != null}
+              value={formState.values.userId}
+              onChange={(e) => onChange("userId", e.target.value)}
+              onBlur={() => onBlur("userId")}
+              helperText={formState.errors["userId"]}
+              error={formState.errors["userId"] != null}
+            />
+            <Typography variant="body1">Checksum</Typography>
+            <TextField
+              fullWidth
+              variant="standard"
+              label=""
+              value={formState.values.checksum}
+              onChange={(e) => onChange("checksum", e.target.value)}
+              onBlur={() => onBlur("checksum")}
+              helperText={formState.errors["checksum"]}
+              error={formState.errors["checksum"] != null}
             />
           </>
         )}

@@ -16,7 +16,7 @@ type BasicOptions = Readonly<{
  * @param factory validator factory
  * @returns
  */
-export const createStringRule =
+export const create =
   <Options extends Record<string, unknown> = Record<never, unknown>>(
     rule: (value: string, options: Options) => ValidationResult
   ): ValidatorFactory<Options & BasicOptions> =>
@@ -42,23 +42,23 @@ const toBigInt = (s: string): bigint | null => {
 };
 
 /** shared validation rules */
-export const rules = {
+export const stringRules = {
   /** non-empty string */
-  required: createStringRule((value) => {
+  required: create((value) => {
     if (value === "") {
       return fail("必須項目です。");
     }
     return pass();
   }),
   /** number */
-  number: createStringRule((value) => {
+  number: create((value) => {
     if (value === "" || /^\d+$/.exec(value) != null) {
       return pass();
     }
     return fail("数字で入力してください。");
   }),
   /** fixed character count */
-  length: createStringRule<{ size: number }>((value, { size }) => {
+  length: create<{ size: number }>((value, { size }) => {
     // consider surrogate pairs
     if (value === "" || Array.from(value).length === size) {
       return pass();
@@ -66,7 +66,7 @@ export const rules = {
     return fail(`${size}文字で入力してください。`);
   }),
   /** max character count */
-  maxLength: createStringRule<{ size: number }>((value, { size }) => {
+  maxLength: create<{ size: number }>((value, { size }) => {
     // consider surrogate pairs
     if (value === "" || Array.from(value).length <= size) {
       return pass();
@@ -74,7 +74,7 @@ export const rules = {
     return fail(`${size}文字以下で入力してください。`);
   }),
   /** integer */
-  integer: createStringRule((value) => {
+  integer: create((value) => {
     if (value === "") {
       return pass();
     }
@@ -85,11 +85,11 @@ export const rules = {
     return pass();
   }),
   /** integer greater than */
-  integerGt: createStringRule<{ rValue: string }>((value, { rValue }) => {
+  integerGt: create<{ target: string }>((value, { target }) => {
     if (value === "") {
       return pass();
     }
-    const targetInt = toBigInt(rValue);
+    const targetInt = toBigInt(target);
     if (targetInt == null) {
       return pass(); // skip validation if option is invalid
     }
@@ -97,6 +97,6 @@ export const rules = {
     if (valueInt != null && targetInt < valueInt) {
       return pass();
     }
-    return fail(`${rValue}以上の整数で入力してください。`);
+    return fail(`${target}以上の整数で入力してください。`);
   }),
 } as const;
