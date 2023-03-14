@@ -1,4 +1,4 @@
-import type { ValidationResult } from "./types";
+import { ValidationResult } from "./types";
 
 const passedResult: ValidationResult = { status: "passed" };
 

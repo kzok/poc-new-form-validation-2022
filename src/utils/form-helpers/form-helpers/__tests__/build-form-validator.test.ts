@@ -2,7 +2,7 @@ import { stringRules } from "../../validation";
 import { initializeState, touchAll } from "../utils";
 import { buildFormValidator } from "../build-form-validator";
 import { describe, it, expect } from "@jest/globals";
-import type { State } from "../types";
+import { State } from "../types";
 import immer from "immer";
 
 describe("example scenario #1", () => {

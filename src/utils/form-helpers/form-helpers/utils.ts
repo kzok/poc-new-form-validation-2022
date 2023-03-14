@@ -1,4 +1,4 @@
-import type { AnyObject, Touches, State } from "./types";
+import { AnyObject, Touches, State } from "./types";
 
 /**
  * @param formState

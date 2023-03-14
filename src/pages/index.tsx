@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import { NextPage } from "next";
 import { ExampleForm1 } from "../containers/example-form-1";
 import { Container, Typography } from "@mui/material";
 

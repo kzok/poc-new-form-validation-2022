@@ -1,4 +1,4 @@
-import type { Validator, ValidationResult } from "./types";
+import { Validator, ValidationResult } from "./types";
 import { pass, fail } from "./utils";
 
 /** factory function returning validator */

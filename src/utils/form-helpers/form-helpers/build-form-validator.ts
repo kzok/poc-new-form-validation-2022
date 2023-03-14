@@ -1,5 +1,5 @@
-import type * as validation from "../validation";
-import type { AnyObject, Validator } from "./types";
+import * as validation from "../validation";
+import { AnyObject, Validator } from "./types";
 
 type AcceptableRule<Value> =
   | validation.ValidationResult
