@@ -1,3 +1,2 @@
-export * from "./types";
-export * from "./utils";
-export * from "./build-form-validator";
+export * as validation from "./validation";
+export * as forms from "./forms";

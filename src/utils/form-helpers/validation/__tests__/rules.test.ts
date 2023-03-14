@@ -1,9 +1,9 @@
-import { createStringRule, rules } from "../rules";
+import { create, stringRules } from "../string-rules";
 import { describe, it, expect } from "@jest/globals";
 import { pass, fail } from "../utils";
 
 describe("create string rule", () => {
-  const rule = createStringRule((value) => {
+  const rule = create((value) => {
     return value === "foo" ? pass() : fail("value isn't foo!");
   });
 
@@ -19,7 +19,7 @@ describe("create string rule", () => {
 });
 
 describe("required", () => {
-  const rule = rules.required({});
+  const rule = stringRules.required({});
 
   it("fails if empty string is passed", () => {
     expect(rule("")).toStrictEqual(fail("必須項目です。"));
@@ -32,7 +32,7 @@ describe("required", () => {
 });
 
 describe("number", () => {
-  const rule = rules.number({});
+  const rule = stringRules.number({});
 
   it("accepts empty string", () => {
     expect(rule("")).toStrictEqual(pass());
@@ -51,7 +51,7 @@ describe("number", () => {
 });
 
 describe("fixed length", () => {
-  const rule = rules.length({ size: 3 });
+  const rule = stringRules.length({ size: 3 });
 
   it("accepts empty string", () => {
     expect(rule("")).toStrictEqual(pass());
@@ -65,7 +65,7 @@ describe("fixed length", () => {
 });
 
 describe("max length", () => {
-  const rule = rules.maxLength({ size: 3 });
+  const rule = stringRules.maxLength({ size: 3 });
 
   it("accepts empty string", () => {
     expect(rule("")).toStrictEqual(pass());
@@ -79,7 +79,7 @@ describe("max length", () => {
 });
 
 describe("integer", () => {
-  const rule = rules.integer({});
+  const rule = stringRules.integer({});
   const message = "整数で入力してください。";
 
   it("accepts empty string", () => {
@@ -101,7 +101,7 @@ describe("integer", () => {
 });
 
 describe("integer greater than", () => {
-  const rule = rules.integerGt({ rValue: "1000" });
+  const rule = stringRules.integerGt({ target: "1000" });
 
   it("accepts empty string", () => {
     expect(rule("")).toStrictEqual(pass());
@@ -127,7 +127,7 @@ describe("integer greater than", () => {
   });
 
   it("any string passes if target option isn't integer", () => {
-    const customizedRule = rules.integerGt({ rValue: "non-integer" });
+    const customizedRule = stringRules.integerGt({ target: "non-integer" });
     expect(customizedRule("foo")).toStrictEqual(pass());
     expect(customizedRule("1000")).toStrictEqual(pass());
     expect(customizedRule("1001")).toStrictEqual(pass());

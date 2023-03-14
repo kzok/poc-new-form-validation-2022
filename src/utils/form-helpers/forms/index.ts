@@ -1,3 +1,3 @@
 export * from "./types";
 export * from "./utils";
-export * from "./rules";
+export * from "./build-form-validator";
