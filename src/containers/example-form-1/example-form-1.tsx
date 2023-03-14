@@ -8,7 +8,7 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import { forms, validation } from "../../utils/form-helpers";
+import { formHelpers, validation } from "../../utils/form-helpers";
 import immer from "immer";
 
 type FormValue = Readonly<{
@@ -18,16 +18,16 @@ type FormValue = Readonly<{
   checksum: string;
 }>;
 
-type FormState = forms.State<FormValue>;
+type FormState = formHelpers.State<FormValue>;
 
-const initialState: FormState = forms.initializeState({
+const initialState: FormState = formHelpers.initializeState({
   haveInvitationCode: false,
   invidationCode: "",
   userId: "",
   checksum: "",
 });
 
-const formValidator = forms.buildFormValidator<FormValue>((config) => {
+const formValidator = formHelpers.buildFormValidator<FormValue>((config) => {
   if (config.values.haveInvitationCode) {
     config.add("invidationCode", [
       validation.stringRules.required({}),
@@ -71,9 +71,9 @@ const useFormState = () => {
     submit: () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
-          draft.touches = forms.touchAll(draft);
+          draft.touches = formHelpers.touchAll(draft);
           draft.errors = formValidator(draft);
-          if (forms.isAllValid(draft)) {
+          if (formHelpers.isAllValid(draft)) {
             window.alert(
               `validation passed!\n ${JSON.stringify(draft.values)}`
             );

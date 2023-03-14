@@ -1,9 +1,11 @@
-import type { ValidationResult, Validator } from "../validation";
-import type { AnyObject, FormValidator } from "./types";
+import type * as validation from "../validation";
+import type { AnyObject, Validator } from "./types";
 
-type AcceptableRule<Value> = ValidationResult | Validator<Value>;
+type AcceptableRule<Value> =
+  | validation.ValidationResult
+  | validation.Validator<Value>;
 
-export type FormValidatorConfig<Form extends AnyObject> = (
+export type ValidatorConfig<Form extends AnyObject> = (
   config: Readonly<{
     /** current form values */
     values: Readonly<Form>;
@@ -42,8 +44,8 @@ const validateValue = <Value>(
  * @returns form validator
  */
 export const buildFormValidator = <Form extends AnyObject>(
-  configure: FormValidatorConfig<Form>
-): FormValidator<Form> => {
+  configure: ValidatorConfig<Form>
+): Validator<Form> => {
   return ({ values, touches }) => {
     // create map of validation rules by form key
     const rulesByKey: { [K in keyof Form]?: AcceptableRule<Form[K]>[] } = {};
