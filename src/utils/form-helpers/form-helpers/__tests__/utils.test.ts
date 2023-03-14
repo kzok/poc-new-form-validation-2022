@@ -1,7 +1,7 @@
 import immer from "immer";
 import { describe, it, expect } from "@jest/globals";
 import { initializeState, haveAnyErrors, isAllValid } from "../utils";
-import type { State } from "../types";
+import { State } from "../types";
 
 type ExampleForm = Readonly<{
   foo: string;

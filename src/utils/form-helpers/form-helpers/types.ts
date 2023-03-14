@@ -26,6 +26,6 @@ export type State<Form extends AnyObject> = Readonly<{
  * @param formState current form state
  * @returns form errors
  */
-export type FormValidator<Form extends AnyObject> = (
+export type Validator<Form extends AnyObject> = (
   formState: Pick<State<Form>, "values" | "touches">
 ) => Errors;
