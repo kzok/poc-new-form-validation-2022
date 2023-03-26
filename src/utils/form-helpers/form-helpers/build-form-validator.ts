@@ -59,11 +59,11 @@ export const buildFormValidator = <Form extends AnyObject>(
     });
 
     // generates form errors
-    const errors: Record<string, string | undefined> = {};
+    const errors: Partial<Record<keyof Form, string | undefined>> = {};
     for (const key in values) {
       if (values.hasOwnProperty(key)) {
         // ignore non-touched key
-        if (touches[key] !== true) {
+        if (touches !== true && touches[key] !== true) {
           continue;
         }
         const rules = rulesByKey[key];

@@ -53,17 +53,16 @@ const useFormState = () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
           draft.values[key] = value;
+          draft.touches = formHelpers.touchKey(formState.touches, key);
           if (key === "haveInvitationCode") {
-            draft.touches[key] = true;
             draft.errors = formValidator(draft);
           }
         })
       );
     },
-    onBlur: (key: keyof FormValue) => {
+    onBlur: () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
-          draft.touches[key] = true;
           draft.errors = formValidator(draft);
         })
       );
@@ -71,7 +70,7 @@ const useFormState = () => {
     submit: () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
-          draft.touches = formHelpers.touchAll(draft);
+          draft.touches = true;
           draft.errors = formValidator(draft);
           if (formHelpers.isAllValid(draft)) {
             window.alert(
@@ -115,7 +114,7 @@ export const ExampleForm1: React.FC = () => {
               label="16 digits"
               value={formState.values.invidationCode}
               onChange={(e) => onChange("invidationCode", e.target.value)}
-              onBlur={() => onBlur("invidationCode")}
+              onBlur={() => onBlur()}
               helperText={formState.errors["invidationCode"]}
               error={formState.errors["invidationCode"] != null}
             />
@@ -129,7 +128,7 @@ export const ExampleForm1: React.FC = () => {
               label="8 digits"
               value={formState.values.userId}
               onChange={(e) => onChange("userId", e.target.value)}
-              onBlur={() => onBlur("userId")}
+              onBlur={() => onBlur()}
               helperText={formState.errors["userId"]}
               error={formState.errors["userId"] != null}
             />
@@ -140,7 +139,7 @@ export const ExampleForm1: React.FC = () => {
               label=""
               value={formState.values.checksum}
               onChange={(e) => onChange("checksum", e.target.value)}
-              onBlur={() => onBlur("checksum")}
+              onBlur={() => onBlur()}
               helperText={formState.errors["checksum"]}
               error={formState.errors["checksum"] != null}
             />

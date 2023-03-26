@@ -1,5 +1,5 @@
 import { stringRules } from "../../validation";
-import { initializeState, touchAll } from "../utils";
+import { initializeState } from "../utils";
 import { buildFormValidator } from "../build-form-validator";
 import { describe, it, expect } from "@jest/globals";
 import { State } from "../types";
@@ -34,7 +34,7 @@ describe("example scenario #1", () => {
     let formState: State<ExampleForm> = exampleFormState;
 
     formState = immer(exampleFormState, (draft) => {
-      draft.touches = touchAll(formState);
+      draft.touches = true;
     });
     expect(validateForm(formState)).toStrictEqual({});
 
