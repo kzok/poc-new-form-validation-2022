@@ -5,28 +5,7 @@ import { AnyObject, State, Touches } from "./types";
  * @returns whether there are any validation errors
  */
 export const haveAnyErrors = (formState: State<AnyObject>): boolean => {
-  for (const key of Object.keys(formState.errors)) {
-    if (formState.errors[key] != null) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * @param formState
- * @returns whether every key is touched and has no errors
- */
-export const isAllValid = (formState: State<AnyObject>): boolean => {
-  if (formState.touches !== true) {
-    return false;
-  }
-  for (const key of Object.keys(formState.errors)) {
-    if (formState.errors[key] != null) {
-      return false;
-    }
-  }
-  return true;
+  return Object.values(formState.errors).some((error) => error != null);
 };
 
 /**

@@ -29,11 +29,3 @@ export type State<Form extends AnyObject> = Readonly<{
   /** validation errors by key */
   errors: Errors<keyof Form & string>;
 }>;
-
-/**
- * @param formState current form state
- * @returns form errors
- */
-export type Validator<Form extends AnyObject> = (
-  formState: Pick<State<Form>, "values" | "touches">
-) => Errors<keyof Form & string>;

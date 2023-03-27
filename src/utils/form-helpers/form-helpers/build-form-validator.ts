@@ -1,5 +1,5 @@
 import * as validation from "../validation";
-import { AnyObject, Validator } from "./types";
+import { AnyObject, State } from "./types";
 
 type AcceptableRule<Value> =
   | validation.ValidationResult
@@ -14,9 +14,9 @@ export type ValidatorConfig<Form extends AnyObject> = (
      * @param key form key
      * @param rules validation rules or results
      */
-    add: <Key extends keyof Form>(
+    add: <Key extends keyof Form & string>(
       key: Key,
-      rules: AcceptableRule<Form[Key]>[]
+      rules: readonly AcceptableRule<Form[Key]>[]
     ) => void;
   }>
 ) => void;
@@ -39,6 +39,24 @@ const validateValue = <Value>(
   return null;
 };
 
+export type Validator<Form extends AnyObject> = Readonly<{
+  /**
+   * @param formState current form state
+   * @returns form errors
+   */
+  generateErrors: (
+    formState: Pick<State<Form>, "values" | "touches">
+  ) => State<Form>["errors"];
+  /**
+   * touches all keys and validate all values
+   * @param formState current form state
+   * @returns [whether or not the validation passed, next form state]
+   */
+  validateAll: (
+    formState: Pick<State<Form>, "initials" | "values">
+  ) => [boolean, State<Form>];
+}>;
+
 /**
  * @param configure
  * @returns form validator
@@ -46,36 +64,39 @@ const validateValue = <Value>(
 export const buildFormValidator = <Form extends AnyObject>(
   configure: ValidatorConfig<Form>
 ): Validator<Form> => {
-  return ({ values, touches }) => {
-    // create map of validation rules by form key
-    const rulesByKey: { [K in keyof Form]?: AcceptableRule<Form[K]>[] } = {};
+  const generateErrors: Validator<Form>["generateErrors"] = ({
+    values,
+    touches,
+  }) => {
+    const errors: Partial<Record<keyof Form, string | undefined>> = {};
     configure({
       values,
       add: (key, params) => {
-        const rules = rulesByKey[key] ?? [];
-        rules.push(...params);
-        rulesByKey[key] = rules;
-      },
-    });
-
-    // generates form errors
-    const errors: Partial<Record<keyof Form, string | undefined>> = {};
-    for (const key in values) {
-      if (values.hasOwnProperty(key)) {
         // ignore non-touched key
         if (touches !== true && touches[key] !== true) {
-          continue;
+          return;
         }
-        const rules = rulesByKey[key];
-        if (rules == null) {
-          continue;
+        // skip validation if there are already validation error
+        if (errors[key] != null) {
+          return;
         }
-        const error = validateValue(values[key], rules);
-        if (error != null) {
-          errors[key] = error;
+        const result = validateValue(values[key], params);
+        if (result != null) {
+          errors[key] = result;
         }
-      }
-    }
+      },
+    });
     return errors;
   };
+  const validateAll: Validator<Form>["validateAll"] = ({
+    initials,
+    values,
+  }) => {
+    const touches = true;
+    const errors = generateErrors({ values, touches });
+    const passed = Object.values(errors).every((error) => error == null);
+    const nextState: State<Form> = { initials, values, errors, touches };
+    return [passed, nextState];
+  };
+  return { generateErrors, validateAll };
 };

@@ -55,7 +55,7 @@ const useFormState = () => {
           draft.values[key] = value;
           draft.touches = formHelpers.touchKey(formState.touches, key);
           if (key === "haveInvitationCode") {
-            draft.errors = formValidator(draft);
+            draft.errors = formValidator.generateErrors(draft);
           }
         })
       );
@@ -63,22 +63,18 @@ const useFormState = () => {
     onBlur: () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
-          draft.errors = formValidator(draft);
+          draft.errors = formValidator.generateErrors(draft);
         })
       );
     },
     submit: () => {
-      setFormState((prev) =>
-        immer(prev, (draft) => {
-          draft.touches = true;
-          draft.errors = formValidator(draft);
-          if (formHelpers.isAllValid(draft)) {
-            window.alert(
-              `validation passed!\n ${JSON.stringify(draft.values)}`
-            );
-          }
-        })
-      );
+      const [passed, nextFormState] = formValidator.validateAll(formState);
+      setFormState(nextFormState);
+      if (passed) {
+        window.alert(
+          `validation passed!\n ${JSON.stringify(nextFormState.values)}`
+        );
+      }
     },
   };
 };
