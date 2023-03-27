@@ -1,29 +1,11 @@
-import { AnyObject, Touches, State } from "./types";
+import { AnyObject, State, Touches } from "./types";
 
 /**
  * @param formState
  * @returns whether there are any validation errors
  */
 export const haveAnyErrors = (formState: State<AnyObject>): boolean => {
-  for (const key of Object.keys(formState.values)) {
-    if (formState.errors[key] != null) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * @param formState
- * @returns whether every key is touched and has no errors
- */
-export const isAllValid = (formState: State<AnyObject>): boolean => {
-  for (const key of Object.keys(formState.values)) {
-    if (formState.touches[key] !== true || formState.errors[key] != null) {
-      return false;
-    }
-  }
-  return true;
+  return Object.values(formState.errors).some((error) => error != null);
 };
 
 /**
@@ -55,13 +37,16 @@ export const initializeState = <Form extends AnyObject>(
 });
 
 /**
- * @param formState
- * @returns
+ * @param touches formState.touches
+ * @param key key of validation
+ * @returns updated touches
  */
-export const touchAll = (formState: State<AnyObject>): Touches => {
-  const touches: { [_: string]: true } = {};
-  for (const key of Object.keys(formState.values)) {
-    touches[key] = true;
+export const touchKey = <Key extends string>(
+  touches: Touches<Key>,
+  key: Key
+): Touches<Key> => {
+  if (touches === true) {
+    return touches;
   }
-  return touches;
+  return { ...touches, [key]: true };
 };

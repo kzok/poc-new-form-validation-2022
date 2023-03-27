@@ -1,6 +1,6 @@
 import immer from "immer";
 import { describe, it, expect } from "@jest/globals";
-import { initializeState, haveAnyErrors, isAllValid } from "../utils";
+import { initializeState, haveAnyErrors } from "../utils";
 import { State } from "../types";
 
 type ExampleForm = Readonly<{
@@ -36,28 +36,6 @@ describe(haveAnyErrors, () => {
       draft.errors = { bar: "some validation error." };
     });
     expect(haveAnyErrors(formState)).toBe(true);
-  });
-});
-
-describe(isAllValid, () => {
-  it("returns false if there are non-touched keys", () => {
-    const formState = initializeState(exampleForm);
-    expect(isAllValid(formState)).toBe(false);
-  });
-
-  it("returns false if there are validation errors", () => {
-    const formState = immer(initializeState(exampleForm), (draft) => {
-      draft.touches["foo"] = true;
-      draft.errors["foo"] = "some validation error.";
-    });
-    expect(isAllValid(formState)).toBe(false);
-  });
-
-  it("returns true if every key is touched and no validation errors exist", () => {
-    const formState = immer(initializeState(exampleForm), (draft) => {
-      draft.touches = { foo: true, bar: true, baz: true };
-    });
-    expect(isAllValid(formState)).toBe(true);
   });
 });
 
