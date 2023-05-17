@@ -1,36 +1,40 @@
 import * as validation from "../validation";
-import { AnyObject, State } from "./types";
+import { AnyObject, State, Validator } from "./types";
+import { haveAnyError } from "./utils";
 
-type AcceptableRule<Value> =
-  | validation.ValidationResult
-  | validation.Validator<Value>;
+type OneOrArray<T> = T | readonly T[];
+type AcceptableRule<Value> = OneOrArray<
+  validation.ValidationResult | validation.Validator<Value>
+>;
 
-export type ValidatorConfig<Form extends AnyObject> = (
+/** @typeParam Values - form values */
+export type ValidatorConfig<Values extends AnyObject> = (
   config: Readonly<{
     /** current form values */
-    values: Readonly<Form>;
+    values: Readonly<Values>;
     /**
      * Add validation rule
      * @param key form key
      * @param rules validation rules or results
      */
-    add: <Key extends keyof Form & string>(
+    add: <Key extends keyof Values & string>(
       key: Key,
-      rules: readonly AcceptableRule<Form[Key]>[]
+      rules: AcceptableRule<Values[Key]>
     ) => void;
   }>
 ) => void;
 
 /**
+ * @typeParam Values - form values
  * @param value form value
  * @param rules validation rules
  * @returns validation error or null
  */
 const validateValue = <Value>(
   value: Value,
-  rules: readonly AcceptableRule<Value>[]
+  rules: AcceptableRule<Value>
 ): string | null => {
-  for (const rule of rules) {
+  for (const rule of Array.isArray(rules) ? rules : [rules]) {
     const result = typeof rule === "function" ? rule(value) : rule;
     if (result.status === "failed") {
       return result.message;
@@ -39,36 +43,19 @@ const validateValue = <Value>(
   return null;
 };
 
-export type Validator<Form extends AnyObject> = Readonly<{
-  /**
-   * @param formState current form state
-   * @returns form errors
-   */
-  generateErrors: (
-    formState: Pick<State<Form>, "values" | "touches">
-  ) => State<Form>["errors"];
-  /**
-   * touches all keys and validate all values
-   * @param formState current form state
-   * @returns [whether or not the validation passed, next form state]
-   */
-  validateAll: (
-    formState: Pick<State<Form>, "initials" | "values">
-  ) => [boolean, State<Form>];
-}>;
-
 /**
+ * @typeParam Values - form values
  * @param configure
  * @returns form validator
  */
-export const buildFormValidator = <Form extends AnyObject>(
-  configure: ValidatorConfig<Form>
-): Validator<Form> => {
-  const generateErrors: Validator<Form>["generateErrors"] = ({
+export const buildValidator = <Values extends AnyObject>(
+  configure: ValidatorConfig<Values>
+): Validator<Values> => {
+  const generateErrors: Validator<Values>["generateErrors"] = ({
     values,
     touches,
   }) => {
-    const errors: Partial<Record<keyof Form, string | undefined>> = {};
+    const errors: Partial<Record<keyof Values, string | undefined>> = {};
     configure({
       values,
       add: (key, params) => {
@@ -88,14 +75,14 @@ export const buildFormValidator = <Form extends AnyObject>(
     });
     return errors;
   };
-  const validateAll: Validator<Form>["validateAll"] = ({
+  const validateAll: Validator<Values>["validateAll"] = ({
     initials,
     values,
   }) => {
     const touches = true;
     const errors = generateErrors({ values, touches });
-    const passed = Object.values(errors).every((error) => error == null);
-    const nextState: State<Form> = { initials, values, errors, touches };
+    const passed = !haveAnyError({ errors });
+    const nextState: State<Values> = { initials, values, errors, touches };
     return [passed, nextState];
   };
   return { generateErrors, validateAll };
