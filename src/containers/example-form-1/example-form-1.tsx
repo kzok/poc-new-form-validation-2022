@@ -31,17 +31,17 @@ const initialState: FormState = formHelpers.create({
 const formValidator = formHelpers.buildValidator<FormValue>((config) => {
   if (config.values.haveInvitationCode) {
     config.add("invidationCode", [
-      validation.stringRules.required({}),
-      validation.stringRules.number({}),
-      validation.stringRules.length({ size: 16 }),
+      validation.rules.required({}),
+      validation.rules.number({}),
+      validation.rules.length({ size: 16 }),
     ]);
   } else {
     config.add("userId", [
-      validation.stringRules.required({}),
-      validation.stringRules.number({}),
-      validation.stringRules.length({ size: 8 }),
+      validation.rules.required({}),
+      validation.rules.number({}),
+      validation.rules.length({ size: 8 }),
     ]);
-    config.add("checksum", [validation.stringRules.required({})]);
+    config.add("checksum", [validation.rules.required({})]);
   }
 });
 

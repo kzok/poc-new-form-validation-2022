@@ -1,4 +1,4 @@
-import { stringRules } from "../../validation";
+import { rules } from "../../validation";
 import { create, touch } from "../utils";
 import { buildValidator } from "../build-validator";
 import { describe, it, expect } from "@jest/globals";
@@ -21,11 +21,11 @@ const { generateErrors, validateAll } = buildValidator<ExampleForm>(
   (config) => {
     // validation rules activated only if enable is true
     if (config.values.enable) {
-      config.add("min", [stringRules.required({}), stringRules.integer({})]);
+      config.add("min", [rules.required({}), rules.int({})]);
       config.add("max", [
-        stringRules.required({}),
-        stringRules.integer({}),
-        stringRules.integerGt({ target: config.values.min }),
+        rules.required({}),
+        rules.int({}),
+        rules.intGt({ target: config.values.min }),
       ]);
     }
   }

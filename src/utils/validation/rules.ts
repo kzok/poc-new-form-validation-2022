@@ -16,7 +16,7 @@ type BasicOptions = Readonly<{
  * @param factory validator factory
  * @returns
  */
-export const create =
+const create =
   <Options extends Record<string, unknown> = Record<never, unknown>>(
     rule: (value: string, options: Options) => ValidationResult
   ): ValidatorFactory<Options & BasicOptions> =>
@@ -41,8 +41,8 @@ const toBigInt = (s: string): bigint | null => {
   }
 };
 
-/** shared validation rules */
-export const stringRules = {
+/** predefined validation rules */
+export const rules = {
   /** non-empty string */
   required: create((value) => {
     if (value === "") {
@@ -58,7 +58,10 @@ export const stringRules = {
     return fail("数字で入力してください。");
   }),
   /** fixed character count */
-  length: create<{ size: number }>((value, { size }) => {
+  length: create<{
+    /** text size */
+    size: number;
+  }>((value, { size }) => {
     // consider surrogate pairs
     if (value === "" || Array.from(value).length === size) {
       return pass();
@@ -66,7 +69,10 @@ export const stringRules = {
     return fail(`${size}文字で入力してください。`);
   }),
   /** max character count */
-  maxLength: create<{ size: number }>((value, { size }) => {
+  maxLength: create<{
+    /** text size */
+    size: number;
+  }>((value, { size }) => {
     // consider surrogate pairs
     if (value === "" || Array.from(value).length <= size) {
       return pass();
@@ -74,7 +80,7 @@ export const stringRules = {
     return fail(`${size}文字以下で入力してください。`);
   }),
   /** integer */
-  integer: create((value) => {
+  int: create((value) => {
     if (value === "") {
       return pass();
     }
@@ -85,7 +91,10 @@ export const stringRules = {
     return pass();
   }),
   /** integer greater than */
-  integerGt: create<{ target: string }>((value, { target }) => {
+  intGt: create<{
+    /** compared to */
+    target: string;
+  }>((value, { target }) => {
     if (value === "") {
       return pass();
     }
