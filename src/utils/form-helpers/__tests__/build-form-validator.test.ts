@@ -1,6 +1,6 @@
-import { stringRules } from "../../validation";
-import { initializeState, touchKey } from "../utils";
-import { buildFormValidator } from "../build-form-validator";
+import { rules } from "../../validation";
+import { create, touch } from "../utils";
+import { buildValidator } from "../build-validator";
 import { describe, it, expect } from "@jest/globals";
 import { State } from "../types";
 import immer from "immer";
@@ -11,21 +11,21 @@ type ExampleForm = Readonly<{
   max: string;
 }>;
 
-const exampleFormState = initializeState<ExampleForm>({
+const exampleFormState = create<ExampleForm>({
   enable: false,
   min: "",
   max: "",
 });
 
-const { generateErrors, validateAll } = buildFormValidator<ExampleForm>(
+const { generateErrors, validateAll } = buildValidator<ExampleForm>(
   (config) => {
     // validation rules activated only if enable is true
     if (config.values.enable) {
-      config.add("min", [stringRules.required({}), stringRules.integer({})]);
+      config.add("min", [rules.required({}), rules.int({})]);
       config.add("max", [
-        stringRules.required({}),
-        stringRules.integer({}),
-        stringRules.integerGt({ target: config.values.min }),
+        rules.required({}),
+        rules.int({}),
+        rules.intGt({ target: config.values.min }),
       ]);
     }
   }
@@ -45,17 +45,17 @@ describe(generateErrors, () => {
     let formState: State<ExampleForm> = exampleFormState;
     formState = immer(formState, (draft) => {
       draft.values.enable = true;
-      draft.touches = touchKey(draft.touches, "enable");
+      draft.touches = touch(draft.touches, "enable");
     });
     expect(generateErrors(formState)).toStrictEqual({});
     formState = immer(formState, (draft) => {
-      draft.touches = touchKey(draft.touches, "min");
+      draft.touches = touch(draft.touches, "min");
     });
     expect(generateErrors(formState)).toStrictEqual({
       min: "必須項目です。",
     });
     formState = immer(formState, (draft) => {
-      draft.touches = touchKey(draft.touches, "max");
+      draft.touches = touch(draft.touches, "max");
     });
     expect(generateErrors(formState)).toStrictEqual({
       min: "必須項目です。",
@@ -67,9 +67,9 @@ describe(generateErrors, () => {
     let formState: State<ExampleForm> = exampleFormState;
     formState = immer(formState, (draft) => {
       draft.values.enable = true;
-      draft.touches = touchKey(draft.touches, "enable");
-      draft.touches = touchKey(draft.touches, "min");
-      draft.touches = touchKey(draft.touches, "max");
+      draft.touches = touch(draft.touches, "enable");
+      draft.touches = touch(draft.touches, "min");
+      draft.touches = touch(draft.touches, "max");
     });
     expect(generateErrors(formState)).toStrictEqual({
       min: "必須項目です。",
@@ -91,11 +91,11 @@ describe(generateErrors, () => {
     let formState: State<ExampleForm> = exampleFormState;
     formState = immer(formState, (draft) => {
       draft.values.enable = true;
-      draft.touches = touchKey(draft.touches, "enable");
+      draft.touches = touch(draft.touches, "enable");
       draft.values.min = "0";
-      draft.touches = touchKey(draft.touches, "min");
+      draft.touches = touch(draft.touches, "min");
       draft.values.max = "1";
-      draft.touches = touchKey(draft.touches, "max");
+      draft.touches = touch(draft.touches, "max");
     });
     expect(generateErrors(formState)).toStrictEqual({});
     formState = immer(formState, (draft) => {

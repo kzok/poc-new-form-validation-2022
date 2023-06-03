@@ -1,20 +1,22 @@
 import { AnyObject, State, Touches } from "./types";
 
 /**
- * @param formState
+ * @param state
  * @returns whether there are any validation errors
  */
-export const haveAnyErrors = (formState: State<AnyObject>): boolean => {
-  return Object.values(formState.errors).some((error) => error != null);
-};
+export const haveAnyError = (
+  state: Pick<State<AnyObject>, "errors">
+): boolean => Object.values(state.errors).some((error) => error != null);
 
 /**
- * @param formState
+ * @param state
  * @returns whether current form value is modified
  */
-export const isModified = (formState: State<AnyObject>): boolean => {
-  const initials: { readonly [_: string]: unknown } = formState.initials;
-  const values: { readonly [_: string]: unknown } = formState.values;
+export const isModified = (
+  state: Pick<State<AnyObject>, "values" | "initials">
+): boolean => {
+  const initials: { readonly [_: string]: unknown } = state.initials;
+  const values: { readonly [_: string]: unknown } = state.values;
   for (const key of Object.keys(initials)) {
     if (initials[key] !== values[key]) {
       return true;
@@ -27,9 +29,9 @@ export const isModified = (formState: State<AnyObject>): boolean => {
  * @param initials initial values
  * @returns form state
  */
-export const initializeState = <Form extends AnyObject>(
-  initials: Form
-): State<Form> => ({
+export const create = <Values extends AnyObject>(
+  initials: Values
+): State<Values> => ({
   initials,
   values: initials,
   touches: {},
@@ -41,7 +43,7 @@ export const initializeState = <Form extends AnyObject>(
  * @param key key of validation
  * @returns updated touches
  */
-export const touchKey = <Key extends string>(
+export const touch = <Key extends string>(
   touches: Touches<Key>,
   key: Key
 ): Touches<Key> => {

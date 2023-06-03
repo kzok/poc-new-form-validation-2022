@@ -8,7 +8,8 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import { formHelpers, validation } from "../../utils/form-helpers";
+import * as formHelpers from "../../utils/form-helpers";
+import * as validation from "../../utils/validation";
 import immer from "immer";
 
 type FormValue = Readonly<{
@@ -20,27 +21,27 @@ type FormValue = Readonly<{
 
 type FormState = formHelpers.State<FormValue>;
 
-const initialState: FormState = formHelpers.initializeState({
+const initialState: FormState = formHelpers.create({
   haveInvitationCode: false,
   invidationCode: "",
   userId: "",
   checksum: "",
 });
 
-const formValidator = formHelpers.buildFormValidator<FormValue>((config) => {
+const formValidator = formHelpers.buildValidator<FormValue>((config) => {
   if (config.values.haveInvitationCode) {
     config.add("invidationCode", [
-      validation.stringRules.required({}),
-      validation.stringRules.number({}),
-      validation.stringRules.length({ size: 16 }),
+      validation.rules.required({}),
+      validation.rules.number({}),
+      validation.rules.length({ size: 16 }),
     ]);
   } else {
     config.add("userId", [
-      validation.stringRules.required({}),
-      validation.stringRules.number({}),
-      validation.stringRules.length({ size: 8 }),
+      validation.rules.required({}),
+      validation.rules.number({}),
+      validation.rules.length({ size: 8 }),
     ]);
-    config.add("checksum", [validation.stringRules.required({})]);
+    config.add("checksum", [validation.rules.required({})]);
   }
 });
 
@@ -53,7 +54,7 @@ const useFormState = () => {
       setFormState((prev) =>
         immer(prev, (draft) => {
           draft.values[key] = value;
-          draft.touches = formHelpers.touchKey(formState.touches, key);
+          draft.touches = formHelpers.touch(formState.touches, key);
           if (key === "haveInvitationCode") {
             draft.errors = formValidator.generateErrors(draft);
           }
